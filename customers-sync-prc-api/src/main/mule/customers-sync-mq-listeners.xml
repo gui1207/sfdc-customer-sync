@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	
+	<flow name="accounts-sync-queueFlow" doc:id="4c5bf873-1cdf-4aae-9856-6a8dd0d84892" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="ce24415c-2ef7-4713-9d35-eca0757b1e0c" config-ref="Anypoint_MQ_Config" destination="accounts-queue"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f641ede9-db79-4124-acad-2622630986db" message="#[message.payload]"/>
+		<ee:transform doc:name="CDM ecommerce" doc:id="d44f9ea3-840a-4563-a8f8-1fac4b11071e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+
+var changePayload = payload.data.payload
+---
+{
+	name: changePayload.Name,
+	externalId: changePayload.ChangeEventHeader.recordIds[0],
+	externalNumber: changePayload.AccountNumber,
+	status: changePayload.payload.active,
+	billingAdrress: if (changePayload.BillingAddress != null){
+		street: changePayload.BillingAddress.Street,
+		city: changePayload.BillingAddress.City,
+		postalCode: changePayload.BillingAddress.PostalCode,
+		state: changePayload.BillingAddress.State,
+		country: changePayload.BillingAddress.Country
+	} else null,
+	shippingAddress: if (changePayload.ShippingAddress != null) {
+		street: changePayload.ShippingAddress.Street,
+		city: changePayload.ShippingAddress.City,
+		postalCode: changePayload.ShippingAddress.PostalCode,
+		state: changePayload.ShippingAddress.State,
+		country: changePayload.ShippingAddress.Country
+	} else null
+} ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="741bf178-e050-4868-9e43-05db59917fb2" >
+			<http:request method="PUT" doc:name="Request to eCommerce API" doc:id="6bd973cc-a4fd-4dd9-96a5-d71df7ffa7c8" config-ref="HTTP_Request_configuration_ecommerce-api" path="/customers"/>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7c982a26-7b34-4a9c-a55d-d4e379efaa0a" type="HTTP:BAD_REQUEST, HTTP:FORBIDDEN, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:NOT_FOUND, HTTP:PARSING, HTTP:UNSUPPORTED_MEDIA_TYPE">
+					<logger level="ERROR" doc:name="Logger" doc:id="e0759062-c419-4e92-8812-2f0747f2e728" message="Error sending the request" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</flow>
+	<flow name="contacts-sync-queueFlow" doc:id="b4a7796f-a3d2-409d-98ff-1952513ed367" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="54528db2-bad9-425a-8459-4ad21831e648" config-ref="Anypoint_MQ_Config" destination="contacts-queue"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3565a026-b5c9-4e9c-b0bf-9b4585d3f3b1" message="#[message.payload]"/>
+		<ee:transform doc:name="CDM customer" doc:id="b01b126a-9007-4684-9bd0-b3b88ad78475">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+
+var changePayload = payload.data.payload
+---
+{
+	title: changePayload.Name.Salutation,
+	firstName: changePayload.Name.FirstName,
+	lastName: changePayload.Name.LastName,
+	customerId: changePayload.ChangeEventHeader.recordIds[0],
+	email: changePayload.Email,
+	birthDate: changePayload.Birthdate,
+	phone: changePayload.Phone,
+	mobilePhone: changePayload.MobilePhone
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="be71c51e-dcf7-4433-96c3-1b92343e9fe1" >
+			<http:request method="PUT" doc:name="Request to Customers API" doc:id="1b4285f1-6d36-4577-9dae-efabc0ffd9ea" config-ref="HTTP_Request_configuration_customers-api" path="/customers"/>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4e0ba2f9-1f02-4b9a-94eb-58802514f13c" type="HTTP:BAD_REQUEST, HTTP:FORBIDDEN, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:NOT_FOUND, HTTP:PARSING, HTTP:UNSUPPORTED_MEDIA_TYPE">
+					<logger level="ERROR" doc:name="Logger" doc:id="4aa099d9-2cbb-42c1-be5d-696414a9d1d6" message="Error sending the request" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</flow>
+</mule>

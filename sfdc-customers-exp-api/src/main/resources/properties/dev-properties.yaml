@@ -1,0 +1,11 @@
+http:
+  port: "8081"
+
+sfdc:
+  username: ""
+  password: ""
+  token: ""
+  
+anypoint-mq:
+  clientId: ""
+  clientSecret: ""

@@ -1,0 +1,13 @@
+anypoint-mq:
+  clientId: ""
+  clientSecret: ""
+  
+ecommerce-api:
+  host: "webhook.site"
+  port: "443"
+  basePath: ""
+  
+customers-api:
+  host: "webhook.site"
+  port: "443"
+  basePath: ""

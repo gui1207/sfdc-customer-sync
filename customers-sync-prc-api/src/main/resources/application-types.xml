@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="sfdc-event" format="json">
+      <types:shape format="weave" example="examples/sfdc-event-example.json"><![CDATA[%dw 2.0
+
+type sfdc_event = {|
+  data: {|
+    schema: String, 
+    payload: {|
+      field1: String, 
+      field2: String, 
+      ChangeEventHeader: {|
+        commitNumber: Number {"typeId": "double"}, 
+        commitUser: String, 
+        sequenceNumber: Number {"typeId": "int"}, 
+        entityName: String, 
+        changeType: String, 
+        changedFields: Array<String>, 
+        changeOrigin: String, 
+        transactionKey: String, 
+        commitTimestamp: Number {"typeId": "double"}, 
+        recordIds: Array<String>
+      |}
+    |}, 
+    event: {| replayId: Number {"typeId": "int"} |}
+  |}, 
+  channel: String
+|} {"example": "{\\\"data\\\":{\\\"schema\\\":\\\"8_j4Jvbl5vY1cUg6ykKsKw\\\",\\\"payload\\\":{\\\"field1\\\":\\\"ABC\\\",\\\"field2\\\":\\\"XYZ\\\",\\\"ChangeEventHeader\\\":{\\\"commitNumber\\\":414700956368,\\\"commitUser\\\":\\\"0055e000004rd3TAAQ\\\",\\\"sequenceNumber\\\":1,\\\"entityName\\\":\\\"Account\\\",\\\"changeType\\\":\\\"UPDATE\\\",\\\"changedFields\\\":[\\\"AccountNumber\\\",\\\"LastModifiedDate\\\",\\\"BillingAddress.Street\\\"],\\\"changeOrigin\\\":\\\"com\\/salesforce\\/api\\/soap\\/54.0;client=SfdcInternalAPI\\/\\\",\\\"transactionKey\\\":\\\"00010ad0-4256-899e-bb71-c3359af42ed9\\\",\\\"commitTimestamp\\\":1654612746000,\\\"recordIds\\\":[\\\"0015e00000ElNtQAAV\\\"]}},\\\"event\\\":{\\\"replayId\\\":46829298}},\\\"channel\\\":\\\"\\/data\\/AccountChangeEvent\\\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#d44f9ea3-840a-4563-a8f8-1fac4b11071e">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="sfdc-event"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

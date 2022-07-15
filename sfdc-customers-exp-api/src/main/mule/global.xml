@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="889d3a67-708d-42ef-91d8-7078781c404a" >
+		<salesforce:basic-connection username="${sfdc.username}" password="${sfdc.password}" securityToken="${sfdc.token}" />
+	</salesforce:sfdc-config>
+	<anypoint-mq:config name="Anypoint_MQ_Config" doc:name="Anypoint MQ Config" doc:id="6ded307c-83c7-49cb-a6aa-e2cfd711d7fb" >
+		<anypoint-mq:connection clientId="${anypoint-mq.clientId}" clientSecret="${anypoint-mq.clientSecret}" />
+	</anypoint-mq:config>
+	<global-property doc:name="Global Property" doc:id="9a5af6b3-1343-464c-bd9e-8df0a557af6e" name="mule.env" value="dev" />
+	<configuration-properties doc:name="Configuration properties" doc:id="f7f1a73d-39ac-4192-bd30-151eb6b5fe71" file="properties/${mule.env}-properties.yaml" />
+</mule>

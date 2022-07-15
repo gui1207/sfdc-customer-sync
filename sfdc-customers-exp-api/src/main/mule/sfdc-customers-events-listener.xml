@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+	
+	<flow name="sfdc-account-listenerFlow" doc:id="93ca6b54-83c6-4c44-badb-e80a1e76b164" >
+		<salesforce:replay-channel-listener doc:name="Account - Replay channel listener" doc:id="d5afccb3-b1c2-4fbd-bf65-0002e04643f5" config-ref="Salesforce_Config" streamingChannel="/data/AccountChangeEvent" replayOption="FROM_LAST_REPLAY_ID" autoReplay="true"/>
+		<anypoint-mq:publish doc:name="Publish" doc:id="162b3afc-577a-4bbe-8968-8a5e426d625c" destination="accounts-queue" config-ref="Anypoint_MQ_Config">
+			<anypoint-mq:body ><![CDATA[#[output application/json
+---
+payload]]]></anypoint-mq:body>
+		</anypoint-mq:publish>
+	</flow>
+	<flow name="sfdc-contact-listenerFlow" doc:id="5325385c-5e02-4251-ad11-f404dcd8247d">
+		<salesforce:replay-channel-listener streamingChannel="/data/ContactChangeEvent" replayOption="FROM_LAST_REPLAY_ID" doc:name="Contact - Replay channel listener" doc:id="a226dde0-b8fd-4651-b5a4-523efcfa2376" config-ref="Salesforce_Config" autoReplay="true" />
+		<anypoint-mq:publish doc:name="Publish" doc:id="0de806c2-fbc1-4969-9def-edf3625234d4" destination="contacts-queue" config-ref="Anypoint_MQ_Config">
+			<anypoint-mq:body ><![CDATA[#[output application/json
+---
+payload]]]></anypoint-mq:body>
+		</anypoint-mq:publish>
+	</flow>
+</mule>

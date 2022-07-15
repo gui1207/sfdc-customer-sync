@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+	<anypoint-mq:config name="Anypoint_MQ_Config" doc:name="Anypoint MQ Config" doc:id="8e42053d-f26f-4ad2-bd7d-ee5ce52b9397" >
+		<anypoint-mq:connection clientId="${anypoint-mq.clientId}" clientSecret="${anypoint-mq.clientSecret}" />
+	</anypoint-mq:config>
+	<global-property doc:name="Global Property" doc:id="b7567c8f-cc71-4bc7-99a2-c1ef6d9a01b2" name="mule.env" value="dev" />
+	<configuration-properties doc:name="Configuration properties" doc:id="2beeca21-cb32-49c3-a7cc-ce1fe08dbfe0" file="properties/${mule.env}-properties.yaml" />
+	<http:request-config name="HTTP_Request_configuration_ecommerce-api" doc:name="HTTP Request configuration" doc:id="d2f64027-f305-4aa2-8408-61f5c5f7a2d5" basePath="${ecommerce-api.basePath}">
+		<http:request-connection protocol="HTTPS" host="${ecommerce-api.host}" port="${ecommerce-api.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_customers-api" doc:name="HTTP Request configuration" doc:id="980b0f10-7fdb-455e-ba61-7e793331c83a" basePath="${customers-api.basePath}">
+		<http:request-connection protocol="HTTPS" host="${customers-api.host}" port="${customers-api.port}" />
+	</http:request-config>
+</mule>
